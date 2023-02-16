@@ -4,9 +4,9 @@ This repo houses my personal website. It contains a backend, frontend, and a dat
 2/16/2023:
 
 The goal of this repository is to synthesize what I learned in my other repositories to deploy an improved version of my personal website. My website is currently deployed via AWS Elastic Beanstalk and features only HTML and CSS served via Flask. I did a little crash-course in create-react-app with Flask over the last few days and am moving directly to next.js. This iteration of my website will feature:
-  - backend API served by Flask
-  - frontend user interface served by next.js (react)
-  - persistent database served by an AWS RDS instance.
+  - a backend API served by Flask
+  - a frontend user interface served by next.js (react)
+  - a persistent database served by an AWS RDS instance
 
 I do not know how I will deploy this, I expect things to change, and Murphy's Law. Some of the features I am interested in implementing over this new system architecture are:
   - an NBA player card deck interface
