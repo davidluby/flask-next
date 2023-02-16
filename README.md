@@ -5,7 +5,7 @@ This repo houses my personal website. It contains a backend, frontend, and a dat
   - backend API served by Flask
   - frontend user interface served by next.js (react)
   - persistent database served by an AWS RDS instance.
-I do not know how I will deploy this, I expect things to change, and Murphy's Law. Some of the features I am interested in implementing over this new system architecture are:
+  I do not know how I will deploy this, I expect things to change, and Murphy's Law. Some of the features I am interested in implementing over this new system architecture are:
     - an NBA player card deck interface
     - a javascript fluid simulation
     - a fourier transform demonstration
