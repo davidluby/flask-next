@@ -12,20 +12,22 @@ from flask_restful import reqparse, Api, Resource
 # Script imports
 import player_data
 
-
-
-
-
 app = Flask(__name__)
 api = Api(app)
 
 parser = reqparse.RequestParser()
 parser.add_argument('task')
-class Message(Resource):
+class get_player_data(Resource):
     def get(self):
-        
-        return {"message": player_data.main('marcus smart')}
-api.add_resource(Message, '/api/flask')
+        data = player_data.main('marcus smart')
+        return {'player_data':data}
+api.add_resource(get_player_data, '/api/get_data')
+
+@app.route('/api/get_data2')
+def get_data():
+    data = player_data.main('lebron james')
+    return {'player_data':data}
+
 
 if __name__ == '__main__':
     app.run(debug=True)

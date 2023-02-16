@@ -13,6 +13,7 @@
 # Package imports
 from bs4 import BeautifulSoup
 import requests
+import json
 
 
 
@@ -102,18 +103,33 @@ def get_data(flag, data, soup):
 
     return data
 
+def format_json(data):
+    data_names = ["name", "pic", "age", "team", "pos", "min",
+                      "fg%", "3p%", "ppg", "reb", "ast", "stl", "blk", "tov"]
+
+    dict = {}
+    i = -1
+    for keys in data_names:
+        i += 1
+        dict[keys] = data[i]
+    
+    out = json.dumps(dict)
+
+    return(out)
+
 
 
 
 def main(name):
     flag, name, soup = find_player(name)
     stats = get_data(flag, name, soup)
+    out = format_json(stats)
 
-    return stats
+    return out
 
 
 if __name__ == '__main__':
     # duplicate at jonesda01-jonesda05
     # short names k love, b bass, b roy
-    main(name)
+    print(main('lebron james'))
 

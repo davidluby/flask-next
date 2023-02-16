@@ -2,16 +2,28 @@ import styles from '../styles/Home.module.css'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-    const [message, setMessage] = useState("");
-    const [name, setName] = useState("")
+    const [playerData, setPlayerData] = useState("");
+    const [playerData2, setPlayerData2] = useState("");
+    const [name, setName] = useState()
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/api/flask/')
+        fetch('/api/get_data/')
             .then(res => res.json())
             .then(data => {
-                setMessage(data.message);
-                console.log(data)
+                setPlayerData(JSON.parse(data.player_data));
+                console.log(playerData)
+                setLoading(false);
+            })
+    }, [])
+
+
+    useEffect(() => {
+        fetch('/api/get_data2/')
+            .then(res => res.json())
+            .then(data => {
+                setPlayerData2(JSON.parse(data.player_data));
+                console.log(playerData2)
                 setLoading(false);
             })
     }, [])
@@ -21,14 +33,15 @@ export default function Home() {
             .then(res => res.json())
             .then(data => {
                 setName(data.name);
-                console.log(data)
+                console.log(name)
                 setLoading(false);
             })
     }, [])
 
     return (
         <div className={styles.container}>
-            <p> {!loading ? message : "Loading.."}</p>
+            <p> {!loading ? playerData.name : "Loading.."}</p>
+            <p> {!loading ? playerData2.name : "Loading.."}</p>
             <p> {!loading ? name : "Loading.."}</p>
         </div>
     )
