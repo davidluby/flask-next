@@ -91,10 +91,9 @@ def get_data(flag, data, soup):
                 "trb_per_g", "ast_per_g", "stl_per_g", "blk_per_g",
                 "tov_per_g", "pts_per_g"]
     
-        count = 0
+
         for id in id_names:
-            count += 1
-            if count == 1:
+            if id == "meta":
                 picture = soup.find("div", {"class","media-item"})
                 data.append(picture.find("img")["src"])
             else:
@@ -105,7 +104,7 @@ def get_data(flag, data, soup):
 
 def format_json(data):
     data_names = ["name", "pic", "age", "team", "pos", "min",
-                      "fg%", "3p%", "ppg", "reb", "ast", "stl", "blk", "tov"]
+                      "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
 
     dict = {}
     i = -1
@@ -124,12 +123,12 @@ def main(name):
     flag, name, soup = find_player(name)
     stats = get_data(flag, name, soup)
     out = format_json(stats)
-
+    
     return out
 
 
 if __name__ == '__main__':
     # duplicate at jonesda01-jonesda05
     # short names k love, b bass, b roy
-    print(main('lebron james'))
+    print(main('jaren jackson jr'))
 

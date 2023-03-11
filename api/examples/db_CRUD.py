@@ -13,11 +13,11 @@ import pyodbc
 
 
 # This function establishes a connection to an MS SQL DB
-def connect():
+def db_connect():
     conn = pyodbc.connect(
         "Driver={SQL Server Native Client 11.0};"
         "Server=website-db.cmtiqqjm470n.us-east-1.rds.amazonaws.com,1433;"
-        "Database=decks;"
+        "Database=player_stats;"
         "Trusted_Connection=no;"
         "UID=davidluby;"
         "PWD=ASIOB785$^%"
@@ -43,12 +43,11 @@ def create(conn):
     #print("Create")
     cursor = conn.cursor()
     cursor.execute(
-        'insert into decks(a,b,c,d,e,f,g,h,i,j,k,l,m,n) values(?,?);',
+        'insert into dummy(a,b) values(?,?);',
         (3232, 'catzzz')
     )
     conn.commit()
     read(conn)
-    return
 
 
 # This function updates data in the DB
@@ -61,7 +60,7 @@ def update(conn):
     )
     conn.commit()
     read(conn)
-    return
+
 
 # This function deltes data in the DB
 def delete(conn):
@@ -72,20 +71,19 @@ def delete(conn):
     )
     conn.commit()
     read(conn)
-    return
 
-def erase(conn):
-    cursor = conn.cursor()
-    cursor.execute(
-        'DROP TABLE dummy'
-    )
-    conn.commit()
-    read(conn)
-    return
+
 
 # Main method
 def main():
-    return()
+    conn = db_connect()
+    read(conn)
+    create(conn)
+    update(conn)
+    delete(conn)
+    out = read(conn)
+    conn.close()
+    return(out)
 
 
 
