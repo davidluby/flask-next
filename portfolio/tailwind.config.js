@@ -15,7 +15,11 @@ module.exports = {
     fontFamily: {
       'base': ["Segoe UI Variable", "Trebuchet MS", "Arial", "Helvetica", "sans-serif", "Times New Roman"]
     },
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'spacing': 'margin'
+      }
+    },
   },
   plugins: [],
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 
 function Nav() {
   return (
-    <nav className="bg-gradient-to-r from-green-700 to-green-900 text-white">
+    <nav className="bg-gradient-to-r from-green-700 to-green-900 text-white mb-7">
         <ul className="flex items-center justify-center space-x-2.5">
             <Link href="/"><li className="nav-logo"></li></Link>
             <Link href="/resume"><li className="nav-button">Resume</li></Link>

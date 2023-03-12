@@ -1,7 +1,7 @@
 
 export default function Resume(){
     return (
-        <div className="flex flex-col p-8">
+        <div className="flex flex-col">
             <div className="flex flex-col items-center border-4">
                 <h1 className="text-3xl border-4 border-yellow-300">
                     Technical Skills

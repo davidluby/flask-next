@@ -14,7 +14,7 @@ export default function Add({data}) {
     console.log(data)
     
   return (
-    <button className="mt-10 bg-green-700 hover:bg-green-900 transition all duration-500 text-white font-bold py-2 px-4 rounded-full"
+    <button className="bg-green-700 hover:bg-green-900 transition all duration-500 text-white font-bold py-2 px-4 rounded-full"
         onClick={saveData}>
         Add to Deck
     </button>

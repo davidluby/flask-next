@@ -7,9 +7,9 @@ export default function Card({data}) {
     const overallRTG = ((data.min/40)*0.2 + +offenseRTG*0.6 + defenseRTG*0.2);
 
   return (
-    <div className="group card-size">
+    <div className="group card-size [perspective:1000px]">
         <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-            <div className="absolute h-full w-full rounded-xl shadow-xl shadow-black/80 bg-center bg-cover bg-no-repeat"
+            <div className="absolute h-full w-full rounded-xl shadow-lg shadow-black/80 bg-center bg-cover bg-no-repeat"
                 style={{backgroundImage: `url(${"./cities/" + data.team.toLowerCase() + ".jpg"})`}}>
             </div>
             <div className="absolute overflow-hidden h-full w-full rounded-xl border-4 border-yellow-500 [backface-visibility:hidden]">
