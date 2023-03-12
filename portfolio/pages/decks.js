@@ -4,7 +4,7 @@ import Card from "./components/card/Card"
 
 export default function decks() {
   return (
-    <div className="flex flex-col px-10">
+    <div className="flex flex-col -mt-5 px-10">
       <Search />
     </div>
   )

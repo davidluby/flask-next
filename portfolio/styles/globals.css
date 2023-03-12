@@ -34,6 +34,10 @@
     width: 18rem;
     height: 28rem;
 }
+.card-window {
+    width: 24rem;
+    height: 34rem;
+}
 .preview {
     filter: blur(2px);
 }
