@@ -23,8 +23,8 @@ export default function Search() {
     };
     const remove = () => {
         if (cards.length > 0) {
-            setCards(cards.pop());
-            console.log(cards);
+            cards.pop();
+            setCards([...cards])
         } else{
             console.log("No cards to remove");
         }
@@ -75,7 +75,12 @@ export default function Search() {
                                         Add to Deck
                                     </button> : <div />}
                     </div>
-                    
+                    <div>
+                        {!loading ? <button className="w-max py-2 px-3 rounded-full bg-green-700 hover:bg-green-900 text-white font-bold transition all duration-500"
+                                            onClick={remove}>
+                                        Remove Card
+                                    </button> : <div />}
+                    </div>
                     
                 </div>
             </div>
