@@ -6,15 +6,19 @@ export default function Card({data}) {
     const defenseRTG = ((data.reb/13)*0.05 + (data.stl/1.2)*0.475 + (data.blk/1)*0.475);
     const overallRTG = ((data.min/40)*0.2 + +offenseRTG*0.6 + defenseRTG*0.2);
 
+    function flipCard() {
+        const flip = document.querySelector("#flipState")
+        flip.classList.toggle("[transform:rotateY(180deg)]")
+    }
   return (
-    <div className="group card-size [perspective:1000px]">
-        <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-            <div className="absolute h-full w-full rounded-xl shadow-lg shadow-black/80 bg-center bg-cover bg-no-repeat"
+    <button className="text-left group card-size transition-all ease-in duration-500 [perspective:1000px]">
+        <div className={"relative h-full w-full transition-all ease-in duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]"}>
+            <div className="absolute h-full w-full rounded-xl shadow-sm shadow-black/80 bg-center bg-cover bg-no-repeat"
                 style={{backgroundImage: `url(${"./cities/" + data.team.toLowerCase() + ".jpg"})`}}>
             </div>
-            <div className="absolute overflow-hidden h-full w-full rounded-xl border-4 border-yellow-500 [backface-visibility:hidden]">
-                <div className="absolute w-[500px;] top-52 rotate-90 pl-10 pb-1 text-2xl font-bold italic text-white bg-yellow-500">
-                    {data.name} - {data.pos}
+            <div className="absolute  overflow-hidden h-full w-full rounded-xl border-4 border-yellow-500 group-hover:border-yellow-300 transition-all duration-500 [backface-visibility:hidden]">
+                <div className="absolute w-[32rem] top-52 rotate-90 pl-12 text-xl font-bold italic text-white bg-yellow-500 group-hover:bg-yellow-300 transition-all duration-500">
+                    {data.team} - {data.name}
                 </div>
             </div>
 
@@ -76,6 +80,6 @@ export default function Card({data}) {
                 </div>
             </div>
         </div>  
-    </div>
+    </button>
   )
 }

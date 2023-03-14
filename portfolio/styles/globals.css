@@ -32,12 +32,19 @@
 }
 .card-size {
     width: 18rem;
-    height: 28rem;
-}
-.card-window {
-    width: 24rem;
-    height: 34rem;
+    height: 26rem;
 }
 .preview {
     filter: blur(2px);
+}
+@keyframes inAnimation {
+    0% {
+        opacity: 0;
+        visibility: hidden;
+        
+    }
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
 }

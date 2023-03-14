@@ -10,6 +10,7 @@
 """
 
 import pyodbc
+from datetime import datetime
 
 
 # This function establishes a connection to an MS SQL DB
@@ -22,8 +23,68 @@ def connect():
         "UID=davidluby;"
         "PWD=ASIOB785$^%"
     )
+
     return conn
 
+def initialize_tables(conn):
+    decks = """IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='decks' AND xtype='U') 
+                CREATE TABLE decks (
+                    id int IDENTITY(1,1) PRIMARY KEY,
+                    saved datetime,
+                    bias VARCHAR(30));
+            """
+    players = """IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='players' AND xtype='U') 
+                CREATE TABLE players (
+                    cardId int,
+                    FOREIGN KEY(cardId) REFERENCES decks(id),
+                    name VARCHAR(50),
+                    pic VARCHAR(100),
+                    age smallint,
+                    team VARCHAR(5),
+                    pos VARCHAR(5),
+                    min smallint, 
+                    fg smallint,
+                    thr smallint,
+                    reb smallint,
+                    ast smallint, 
+                    stl smallint,
+                    blk smallint,
+                    tov smallint,
+                    ppg smallint);
+            """
+    
+
+    cursor = conn.cursor()
+    cursor.execute(decks)
+    cursor.execute(players)
+
+    #cursor.execute("DROP TABLE players")
+    #cursor.execute("DROP TABLE decks")
+    #cursor.execute("TRUNCATE tableName") # delete content
+    
+    return
+
+def display_tables(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM INFORMATION_SCHEMA.TABLES;")
+    
+    for tables in cursor:
+        print(tables)
+    
+    cursor.commit()
+
+    return
+
+
+def handle_deck(conn, deck):
+    cursor = conn.cursor()
+    if (deck[0]['id'] == "null"):
+        #cursor.execute("""INSERT INTO DECKS""")
+        print(deck[0]['id'], "new id")
+    else:
+        print("update id")
+
+    return
 
 
 # This function reads from the DB
@@ -35,7 +96,7 @@ def read(conn):
     for row in cursor:
         out.append(str(row))
         print(f'row = {row}')
-    return(out)
+    return out
 
 
 # This function creates data entries in the DB
@@ -43,7 +104,7 @@ def create(conn):
     #print("Create")
     cursor = conn.cursor()
     cursor.execute(
-        'insert into decks(a,b,c,d,e,f,g,h,i,j,k,l,m,n) values(?,?);',
+        'insert into decks(a,b) values(?,?);',
         (3232, 'catzzz')
     )
     conn.commit()
@@ -85,7 +146,10 @@ def erase(conn):
 
 # Main method
 def main():
-    return()
+
+    conn = connect()
+    initialize_tables(conn)
+    display_tables(conn)
 
 
 

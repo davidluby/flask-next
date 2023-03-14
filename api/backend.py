@@ -28,19 +28,15 @@ class get_player_data(Resource):
 api.add_resource(get_player_data, '/api/get_data')
 
 
-
-class create_deck(Resource):
+class handle_deck(Resource):
     def post(self):
-        print()
-api.add_resource(create_deck, '/api/create_deck')
+        deck = request.get_json()
 
 
-
-class add_player(Resource):
-    def post(self):
-        data = request.get_json()
-        print(data['name'])
-api.add_resource(add_player, '/api/add_player')
+        conn = crud.connect()
+        crud.handle_deck(conn, deck)
+        print(deck)
+api.add_resource(handle_deck, '/api/handle_deck')
 
 
 

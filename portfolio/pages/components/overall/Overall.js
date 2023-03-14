@@ -11,7 +11,7 @@ function Overall({category, overall}) {
   return (
     <div className="text-xs dark:text-white">
       {category}
-      <div className="mb-1 w-full h-1.5 rounded-full bg-slate-700">
+      <div className="mt-1 w-full h-1.5 rounded-full bg-slate-700">
         <div className="h-full bg-green-500 rounded-full"
           style={{ width: rating }}>
           </div>

@@ -18,11 +18,10 @@ import json
 
 
 """
-# This function takes a players full name and returns the corresponding
-# URL from Basketball-Reference.com
+ # This function takes a players full name and returns the corresponding
+ # URL from Basketball-Reference.com
 """
 def find_player(full_name):
-    data = []
 
 
     # Handle input for URL assembly
@@ -58,6 +57,7 @@ def find_player(full_name):
         soup = BeautifulSoup(page.text, 'html.parser')
         check_page = soup.h1
 
+        data = []
         if check_page.get_text() == "Page Not Found (404 error)":
             data.append("Try again. No player was found.")
             break
@@ -77,8 +77,8 @@ def find_player(full_name):
 
 
 """
-# This function takes a player page soup and returns the corresponding
-# player's statistics from Basketball-Reference.com
+ # This function takes a player page soup and returns the corresponding
+ # player's statistics from Basketball-Reference.com
 """
 def get_data(flag, data, soup):
 
@@ -102,15 +102,20 @@ def get_data(flag, data, soup):
 
     return data
 
+
+# This function parses soup, appends to a list, and returns JSON data
 def format_json(data):
-    data_names = ["name", "pic", "age", "team", "pos", "min",
+    data_names = ["id", "name", "pic", "age", "team", "pos", "min",
                       "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
 
     dict = {}
     i = -1
     for keys in data_names:
         i += 1
-        dict[keys] = data[i]
+        if i == 0:
+            dict[keys] = "null"
+        else:
+            dict[keys] = data[i-1]
     
     out = json.dumps(dict)
 
@@ -120,8 +125,8 @@ def format_json(data):
 
 
 def main(name):
-    flag, name, soup = find_player(name)
-    stats = get_data(flag, name, soup)
+    flag, data, soup = find_player(name)
+    stats = get_data(flag, data, soup)
     out = format_json(stats)
     
     return out
@@ -130,5 +135,5 @@ def main(name):
 if __name__ == '__main__':
     # duplicate at jonesda01-jonesda05
     # short names k love, b bass, b roy
-    print(main('jaren jackson jr'))
+    print(main('lebron james'))
 
