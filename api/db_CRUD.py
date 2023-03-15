@@ -16,100 +16,119 @@ from datetime import datetime
 # This function establishes a connection to an MS SQL DB
 def connect():
     conn = pyodbc.connect(
-        "Driver={SQL Server Native Client 11.0};"
-        "Server=website-db.cmtiqqjm470n.us-east-1.rds.amazonaws.com,1433;"
-        "Database=decks;"
-        "Trusted_Connection=no;"
-        "UID=davidluby;"
-        "PWD=ASIOB785$^%"
-    )
+                            "Driver={SQL Server Native Client 11.0};"
+                            "Server=website-db.cmtiqqjm470n.us-east-1.rds.amazonaws.com,1433;"
+                            "Database=decks;"
+                            "Trusted_Connection=no;"
+                            "UID=davidluby;"
+                            "PWD=ASIOB785$^%"
+                        )
 
     return conn
 
+
+# This function creates two tables in the DB for decks and cards
 def initialize_tables(conn):
-    decks = """IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='decks' AND xtype='U') 
-                CREATE TABLE decks (
-                    id int IDENTITY(1,1) PRIMARY KEY,
-                    saved datetime,
-                    bias VARCHAR(30));
-            """
-    players = """IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='players' AND xtype='U') 
-                CREATE TABLE players (
-                    cardId int,
-                    FOREIGN KEY(cardId) REFERENCES decks(id),
-                    name VARCHAR(50),
-                    pic VARCHAR(100),
-                    age smallint,
-                    team VARCHAR(5),
-                    pos VARCHAR(5),
-                    min smallint, 
-                    fg smallint,
-                    thr smallint,
-                    reb smallint,
-                    ast smallint, 
-                    stl smallint,
-                    blk smallint,
-                    tov smallint,
-                    ppg smallint);
+    decks =  """
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='decks' AND xtype='U') 
+            CREATE TABLE decks (
+                id int IDENTITY(1,1) PRIMARY KEY,
+                saved datetime,
+                bias VARCHAR(30));
             """
     
+    cards = """
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cards' AND xtype='U')
+            CREATE TABLE cards (
+                deckId int,
+                FOREIGN KEY(deckId) REFERENCES decks(id),
+                name VARCHAR(50),
+                pic VARCHAR(100),
+                age smallint,
+                team VARCHAR(5),
+                pos VARCHAR(5),
+                min FLOAT, 
+                fg FLOAT,
+                thr FLOAT,
+                reb FLOAT,
+                ast FLOAT, 
+                stl FLOAT,
+                blk FLOAT,
+                tov FLOAT,
+                ppg FLOAT);
+            """
 
     cursor = conn.cursor()
     cursor.execute(decks)
-    cursor.execute(players)
+    cursor.execute(cards)
+    conn.commit()
 
-    #cursor.execute("DROP TABLE players")
-    #cursor.execute("DROP TABLE decks")
-    #cursor.execute("TRUNCATE tableName") # delete content
-    
     return
+
+
 
 def display_tables(conn):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM INFORMATION_SCHEMA.TABLES;")
+    cursor.execute(
+        'SELECT * FROM INFORMATION_SCHEMA.TABLES;'
+    )
     
-    for tables in cursor:
-        print(tables)
-    
-    cursor.commit()
+
+    print("\n----- Tables -----")
+    tables = []
+    i = -1
+    for table in cursor:
+        i += 1
+        tables.append(table)
+        print("\n----- Table "+ str(i) +" -----")
+        print(tables[i])
+
+    for table in tables:
+        cursor.execute(f'SELECT * FROM {table[2]}')
+        for row in cursor:
+            print(f'{row}')
+        print()
 
     return
 
 
-def handle_deck(conn, deck):
+
+def save_deck(conn, deck):
     cursor = conn.cursor()
-    if (deck[0]['id'] == "null"):
-        #cursor.execute("""INSERT INTO DECKS""")
-        print(deck[0]['id'], "new id")
+
+    if (len(deck) == 5):
+        cursor.execute(
+            'INSERT INTO decks VALUES (?, ?)',
+            (datetime.now(), 'boston'))
+        conn.commit()
+
+        id = cursor.execute("""
+            SELECT * FROM decks
+            WHERE ID = (
+                SELECT MAX(id) FROM decks
+            )
+            """ 
+        ).fetchval()
+
+        for cards in deck:
+            cards['deckId'] = id
+            
+            cursor.execute(
+                'INSERT INTO cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (cards["deckId"], cards["name"], cards["pic"], cards["age"], cards["team"],
+                 cards["pos"], cards["min"], cards["fg"], cards["thr"], cards["reb"],
+                 cards["ast"], cards["stl"], cards["blk"], cards["tov"], cards["ppg"])
+            )
+            
+
+            conn.commit()
+
     else:
         print("update id")
 
-    return
-
-
-# This function reads from the DB
-def read(conn):
-    #print("Read")
-    cursor = conn.cursor()
-    cursor.execute("select * from dummy")
-    out = []
-    for row in cursor:
-        out.append(str(row))
-        print(f'row = {row}')
-    return out
-
-
-# This function creates data entries in the DB
-def create(conn):
-    #print("Create")
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into decks(a,b) values(?,?);',
-        (3232, 'catzzz')
-    )
     conn.commit()
-    read(conn)
     return
+
 
 
 # This function updates data in the DB
@@ -121,35 +140,41 @@ def update(conn):
         ('dogzzz', 3232)
     )
     conn.commit()
-    read(conn)
     return
 
-# This function deltes data in the DB
-def delete(conn):
-    #print("Delete")
+
+
+# This function can be used to clear the DB
+def reset(conn):
     cursor = conn.cursor()
-    cursor.execute(
+    cursor.execute('DROP TABLE cards')
+    cursor.execute('DROP TABLE decks')
+
+    #cursor.execute("TRUNCATE TABLE players")
+    #cursor.execute("TRUNCATE TABLE decks")
+
+    """cursor.execute(
         'delete from dummy where a > 5'
     )
+    """
+
     conn.commit()
-    read(conn)
+
     return
 
-def erase(conn):
-    cursor = conn.cursor()
-    cursor.execute(
-        'DROP TABLE dummy'
-    )
-    conn.commit()
-    read(conn)
-    return
+
 
 # Main method
 def main():
 
     conn = connect()
+
     initialize_tables(conn)
+    #display_tables(conn)
+
+    #reset(conn)
     display_tables(conn)
+
 
 
 

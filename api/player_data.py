@@ -105,7 +105,7 @@ def get_data(flag, data, soup):
 
 # This function parses soup, appends to a list, and returns JSON data
 def format_json(data):
-    data_names = ["id", "name", "pic", "age", "team", "pos", "min",
+    data_names = ["deckId", "name", "pic", "age", "team", "pos", "min",
                       "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
 
     dict = {}

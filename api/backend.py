@@ -2,7 +2,6 @@
 # Author: David Luby
 # Date Created: 2/15/2023
 #
-# hello.py is comprised of a backend API that facilitates a react.js frontend
 """
 
 # Package imports
@@ -28,17 +27,16 @@ class get_player_data(Resource):
 api.add_resource(get_player_data, '/api/get_data')
 
 
-class handle_deck(Resource):
+class intake_deck(Resource):
     def post(self):
         deck = request.get_json()
 
-
         conn = crud.connect()
-        crud.handle_deck(conn, deck)
-        print(deck)
-api.add_resource(handle_deck, '/api/handle_deck')
+        crud.save_deck(conn, deck)
+        crud.display_tables(conn)
+api.add_resource(intake_deck, '/api/intake_deck')
 
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)

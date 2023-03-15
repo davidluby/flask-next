@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Save({data}) {
     const saveData = () => {
-        fetch('/api/handle_deck', {
+        fetch('/api/intake_deck', {
             method: "POST",
             headers: {
                 "Content-Type":"application/json"
