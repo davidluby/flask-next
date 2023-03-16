@@ -1,15 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card from "../card/Card";
 import Save from "../button/Save"
 import ExpandCards from "../button/ExpandCards"
 
-export default function Search() {
+export default function Search({cards, setCards}) {
     const [playerName, setPlayerName] = useState("");
     const [playerData, setPlayerData] = useState("");
     const [loading, setLoading] = useState(true);
-    const [cards, setCards] = useState([]);
     const [empty, setEmpty] = useState(true);
 
+
+    const handleSubmit = event => {
+        setPlayerName(event.target.value);
+    };
+    
     const getData = (event) => {
         if (event.key ===  "Enter") {
             fetch('/api/get_data/', {
@@ -30,10 +34,6 @@ export default function Search() {
         )
         }
     }
-
-    const handleSubmit = event => {
-        setPlayerName(event.target.value);
-    };
 
     const add = () => {
         if (cards.length < 5) {
@@ -97,7 +97,7 @@ export default function Search() {
                                 <div className="flex flex-row justify-center -space-x-72 border-4 border-red-500"
                                     id="expand">
                                     {
-                                        cards.map(function(item, idx){
+                                        cards.map(function(item, idx) {
                                             return <div className="scale-50 transition-all ease-in duration-500"
                                                         id={"zoomCard-"+idx}
                                                         key={idx}

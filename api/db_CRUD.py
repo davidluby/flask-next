@@ -11,6 +11,7 @@
 
 import pyodbc
 from datetime import datetime
+import json
 
 
 # This function establishes a connection to an MS SQL DB
@@ -93,7 +94,7 @@ def display_tables(conn):
 
 
 
-def save_deck(conn, deck):
+def create_deck(conn, deck):
     cursor = conn.cursor()
 
     if (len(deck) == 5):
@@ -129,7 +130,43 @@ def save_deck(conn, deck):
     conn.commit()
     return
 
+def read_deck(conn):
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT * FROM INFORMATION_SCHEMA.TABLES'
+    )
 
+    tables = []
+    for table in cursor:
+        tables.append(table)
+
+
+
+    data_names = ["deckId", "name", "pic", "age", "team", "pos", "min",
+                      "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
+    decks = []
+    j = -1
+    for table in tables:
+        j += 1
+        deck = {}
+        cursor.execute(f'SELECT * FROM {table[2]}')
+        i = -1
+        for row in cursor:
+            i += 1
+            if j == 0:
+                deck['meta'] = row
+                decks.append(deck)
+            else:
+                for keys in data_names:
+                    cursor.execute(
+                        f"""SELECT * FROM {table[2]}
+                        WHERE deckId = ?;""",
+                        (i)
+                    )
+                    deck[keys] = row[i]
+
+    decks = json.dumps(dict)
+    return decks
 
 # This function updates data in the DB
 def update(conn):

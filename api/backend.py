@@ -30,11 +30,19 @@ api.add_resource(get_player_data, '/api/get_data')
 class intake_deck(Resource):
     def post(self):
         deck = request.get_json()
-
         conn = crud.connect()
-        crud.save_deck(conn, deck)
-        crud.display_tables(conn)
+        #crud.create_deck(conn, deck)
+        #crud.display_tables(conn)
+        print('deck length: ', len(deck))
 api.add_resource(intake_deck, '/api/intake_deck')
+
+class show_decks(Resource):
+    def get(self):
+        conn = crud.connect()
+        decks = crud.read_deck(conn)
+        return {decks}
+
+api.add_resource(show_decks, '/api/show_decks')
 
 
 
