@@ -1,15 +1,17 @@
 import React from 'react'
 
-export default function Save({data}) {
+export default function Save({cards, deck}) {
     const saveData = () => {
+        cards.unshift(deck)
         fetch('/api/intake_deck', {
             method: "POST",
             headers: {
                 "Content-Type":"application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(cards)
         }
         )
+        cards.shift()
     }
     
   return (

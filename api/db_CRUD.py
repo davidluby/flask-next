@@ -29,12 +29,13 @@ def connect():
 
 
 # This function creates two tables in the DB for decks and cards
-def initialize_tables(conn):
+def initialize_tables():
+    conn = connect()
     decks =  """
         IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='decks' AND xtype='U') 
             CREATE TABLE decks (
                 id int IDENTITY(1,1) PRIMARY KEY,
-                saved datetime,
+                saved VARCHAR(30),
                 bias VARCHAR(30));
             """
     
@@ -68,7 +69,8 @@ def initialize_tables(conn):
 
 
 
-def display_tables(conn):
+def display_tables():
+    conn = connect()
     cursor = conn.cursor()
     cursor.execute(
         'SELECT * FROM INFORMATION_SCHEMA.TABLES;'
@@ -94,13 +96,17 @@ def display_tables(conn):
 
 
 
-def create_deck(conn, deck):
+def intake_deck(deck):
+    conn = connect()
     cursor = conn.cursor()
 
-    if (len(deck) == 5):
+    dateFormat = '%d-%m-%y %H:%M'
+    dateTimeNow = datetime.now().strftime(dateFormat)
+
+    if (deck[0]['id'] == 'null'):
         cursor.execute(
             'INSERT INTO decks VALUES (?, ?)',
-            (datetime.now(), 'boston'))
+            (dateTimeNow, 'boston'))
         conn.commit()
 
         id = cursor.execute("""
@@ -111,7 +117,7 @@ def create_deck(conn, deck):
             """ 
         ).fetchval()
 
-        for cards in deck:
+        for cards in deck[1::]:
             cards['deckId'] = id
             
             cursor.execute(
@@ -130,46 +136,54 @@ def create_deck(conn, deck):
     conn.commit()
     return
 
-def read_deck(conn):
+def read_deck():
+    conn = connect()
     cursor = conn.cursor()
     cursor.execute(
-        'SELECT * FROM INFORMATION_SCHEMA.TABLES'
+        'SELECT * FROM decks'
     )
 
-    tables = []
-    for table in cursor:
-        tables.append(table)
+    deck_keys = ['id', 'saved', 'bias']
 
-
-
-    data_names = ["deckId", "name", "pic", "age", "team", "pos", "min",
-                      "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
     decks = []
-    j = -1
-    for table in tables:
-        j += 1
+    for row in cursor:
         deck = {}
-        cursor.execute(f'SELECT * FROM {table[2]}')
         i = -1
-        for row in cursor:
+        for data in row:
             i += 1
-            if j == 0:
-                deck['meta'] = row
-                decks.append(deck)
-            else:
-                for keys in data_names:
-                    cursor.execute(
-                        f"""SELECT * FROM {table[2]}
-                        WHERE deckId = ?;""",
-                        (i)
-                    )
-                    deck[keys] = row[i]
+            deck[deck_keys[i]] = data
+        decks.append(deck)
 
-    decks = json.dumps(dict)
-    return decks
+    cursor.execute(
+        'SELECT * FROM cards'
+    )
+
+    card_keys = ["deckId", "name", "pic", "age", "team", "pos", "min",
+                "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
+    
+    entries = []
+    i = -1
+    for deck in decks:
+        i += 1
+        combine = [deck]
+        cursor.execute(
+            f'SELECT * FROM cards WHERE deckID = {deck["id"]}'
+        )
+        for row in cursor:
+            dict = {}
+            j = -1
+            for keys in card_keys:
+                j += 1
+                dict[keys] = row[j]
+            combine.append(dict)
+        entries.append(combine)
+    #print(entries)
+
+    return json.dumps(entries)
 
 # This function updates data in the DB
-def update(conn):
+def update():
+    conn = connect()
     #print("Update")
     cursor = conn.cursor()
     cursor.execute(
@@ -182,7 +196,8 @@ def update(conn):
 
 
 # This function can be used to clear the DB
-def reset(conn):
+def reset():
+    conn = connect()
     cursor = conn.cursor()
     cursor.execute('DROP TABLE cards')
     cursor.execute('DROP TABLE decks')
@@ -204,13 +219,10 @@ def reset(conn):
 # Main method
 def main():
 
-    conn = connect()
-
-    initialize_tables(conn)
-    #display_tables(conn)
-
-    #reset(conn)
-    display_tables(conn)
+    #initialize_tables()
+    #reset()
+    display_tables()
+    #read_deck()
 
 
 

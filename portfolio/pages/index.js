@@ -1,4 +1,4 @@
-import Add from "./components/button/Save"
+import Add from "./components/buttons/Save"
 
 export default function Home() {
     

@@ -1,5 +1,5 @@
 import React from 'react'
-import Overall from "../overall/Overall"
+import Overall from "./Overall"
 
 export default function Card({data}) {
     const offenseRTG = ((data.ppg/28)*0.6 + (data.reb/9)*0.1 + (data.ast/9)*0.3);

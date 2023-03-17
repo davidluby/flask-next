@@ -105,12 +105,12 @@ def get_data(flag, data, soup):
 
 # This function parses soup, appends to a list, and returns JSON data
 def format_json(data):
-    data_names = ["deckId", "name", "pic", "age", "team", "pos", "min",
-                      "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
+    card_keys = ["deckId", "name", "pic", "age", "team", "pos", "min",
+                "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
 
     dict = {}
     i = -1
-    for keys in data_names:
+    for keys in card_keys:
         i += 1
         if i == 0:
             dict[keys] = "null"
@@ -128,8 +128,7 @@ def main(name):
     flag, data, soup = find_player(name)
     stats = get_data(flag, data, soup)
     out = format_json(stats)
-    
-    return out
+    return (out)
 
 
 if __name__ == '__main__':
