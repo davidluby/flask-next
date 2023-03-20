@@ -1,28 +1,32 @@
 import React from 'react'
 import Overall from "./Overall"
 
-export default function Card({data}) {
+export default function Card({ data, loc }) {
     const offenseRTG = ((data.ppg/28)*0.6 + (data.reb/9)*0.1 + (data.ast/9)*0.3);
     const defenseRTG = ((data.reb/13)*0.05 + (data.stl/1.2)*0.475 + (data.blk/1)*0.475);
     const overallRTG = ((data.min/40)*0.2 + +offenseRTG*0.6 + defenseRTG*0.2);
 
     function flipCard() {
-        const flip = document.querySelector("#flipState")
+        const id = '#flipState-'+loc
+        const flip = document.querySelector(id)
         flip.classList.toggle("[transform:rotateY(180deg)]")
     }
   return (
-    <button className="text-left group card-size transition-all ease-in duration-500 [perspective:1000px]">
-        <div className={"relative h-full w-full transition-all ease-in duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]"}>
+    <button className="group text-left card-size transition-all ease-in duration-500 [perspective:1000px]">
+        <div className="relative h-full w-full transition-all ease-in duration-500 [transform-style:preserve-3d]"
+            id={"flipState-"+loc}
+            onClick={() => flipCard()}>
             <div className="absolute h-full w-full rounded-xl shadow-sm shadow-black/80 bg-center bg-cover bg-no-repeat"
                 style={{backgroundImage: `url(${"./cities/" + data.team.toLowerCase() + ".jpg"})`}}>
             </div>
-            <div className="absolute  overflow-hidden h-full w-full rounded-xl border-4 border-yellow-500 group-hover:border-yellow-300 transition-all duration-500 [backface-visibility:hidden]">
+            <div className="absolute overflow-hidden h-full w-full rounded-xl border-4 border-yellow-500 group-hover:border-yellow-300 transition-all duration-500 [backface-visibility:hidden]">
                 <div className="absolute w-[32rem] top-52 rotate-90 pl-12 text-xl font-bold italic text-white bg-yellow-500 group-hover:bg-yellow-300 transition-all duration-500">
                     {data.team} - {data.name}
                 </div>
             </div>
 
-            <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
+            <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]"
+                id="flipState">
                 <div className="flex flex-col items-center justify-evenly h-full w-full p-4 rounded-xl bg-black/60 text-white">
                     <div className="flex flex-row space-x-6">
                         <img src={data.pic} className="rounded-full"/>

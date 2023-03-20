@@ -136,6 +136,8 @@ def intake_deck(deck):
     conn.commit()
     return
 
+
+
 def read_deck():
     conn = connect()
     cursor = conn.cursor()
@@ -180,6 +182,8 @@ def read_deck():
     #print(entries)
 
     return json.dumps(entries)
+
+
 
 # This function updates data in the DB
 def update():

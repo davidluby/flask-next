@@ -17,6 +17,20 @@
     background-image: url("/logo.png");
     background-size: 100%;
 }
+.nav-ball {
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("/bball-trans.png");
+    background-size: 90%;
+    transition: all 500ms;
+}
+.nav-ball:hover {
+    background-image: url("/bball.png");
+    background-size: 100%;
+}
 .nav-button {
     font-size: 1.3rem;
     padding: .3rem;

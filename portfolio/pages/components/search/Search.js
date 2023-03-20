@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Card from "../card/Card"
+import Add from "../buttons/Add"
 import Interface from "../interface/Interface"
 
 export default function Search({ cards, setCards, deck, setDeck }) {
@@ -35,25 +36,8 @@ export default function Search({ cards, setCards, deck, setDeck }) {
         }
     }
 
-    const add = () => {
-        if (cards.length < 5) {
-            setCards([...cards, playerData]);
-            setHidden(false);
-        } else{
-            console.log("Too many cards");
-        }
-    };
-    const remove = () => {
-        if (cards.length > 0) {
-            cards.pop();
-            setCards([...cards])
-        } else{
-            console.log("No cards to remove");
-        }
-    };
-
     return (
-        <div className="flex flex-col items-center border-4 border-green-400">
+        <div className="flex flex-col items-center w-full border-4 border-green-400">
 
 
             <div className="flex flex-col items-center w-1/2 relative border-4 border-yellow-400">
@@ -73,22 +57,15 @@ export default function Search({ cards, setCards, deck, setDeck }) {
                 <div className="flex flex-col items-center border-4 border-orange-300">
                     <div className="flex items-center justify-center scale-75 border-4 border-green-700">
                         {!searching ? <div style={{animation : "inAnimation 500ms ease-in"}} >
-                                        <Card data={playerData} />
+                                        <Card data={playerData} loc="main" />
                                     </div>
                                      : <p className="text-center border-4">Enter an active NBA player's name above</p>}
                     </div>
                     <div className="flex flex-row space-x-4 border-4 border-yellow-400">
-                        {!searching ? <button className="w-max py-2 px-3 rounded-full bg-green-700 hover:bg-green-900 text-white font-bold transition all duration-500"
-                                            onClick={add}>
-                                        Add to Deck
-                                    </button> : null}
-                        {!searching ? <button className="w-max py-2 px-3 rounded-full bg-green-700 hover:bg-green-900 text-white font-bold transition all duration-500"
-                                            onClick={remove}>
-                                        Remove Card
-                                    </button> : null}
+                        {!searching ? <Add cards={cards} setCards={setCards} playerData={playerData} setHidden={setHidden} /> : null}
                     </div>
                 </div>
-                { !hidden ? <Interface cards={cards} deck={deck} setDeck={setDeck} /> : null }
+                { !hidden ? <Interface cards={cards} setCards={setCards} deck={deck} setDeck={setDeck} /> : null }
             </div>
         </div>    
     )

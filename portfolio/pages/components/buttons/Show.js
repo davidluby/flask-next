@@ -16,7 +16,6 @@ export default function Show() {
                 data => {
                     setDecks(JSON.parse(data))
                     setEmpty(false)
-                    console.log(decks)
                 }
             )
         )
@@ -37,7 +36,7 @@ export default function Show() {
                                 <div className="flex flex-row justify-center">
                                     {cards.map(function(card, jdx) {
                                         return <div key={jdx}>
-                                                    <Card data={card} />
+                                                    <Card data={card} loc={idx.toString()+jdx.toString()} />
                                                 </div>
                                         })
                                     }
