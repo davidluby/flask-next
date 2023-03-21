@@ -9,6 +9,7 @@ const zoomCard = (idx) => {
         zoom.classList.toggle("z-50");
         zoom.classList.toggle("scale-[.65]");
         zoom.classList.toggle("scale-85");
+        zoom.classList.toggle("hover:bottom-2")
     };
 };
 

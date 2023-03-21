@@ -14,18 +14,137 @@ from datetime import datetime
 import json
 
 
-# This function establishes a connection to an MS SQL DB
-def connect():
-    conn = pyodbc.connect(
-                            "Driver={SQL Server Native Client 11.0};"
-                            "Server=website-db.cmtiqqjm470n.us-east-1.rds.amazonaws.com,1433;"
-                            "Database=decks;"
-                            "Trusted_Connection=no;"
-                            "UID=davidluby;"
-                            "PWD=ASIOB785$^%"
-                        )
+# This function creates a new deck in the DB
+def create_deck(deck):
+    conn = connect()
+    cursor = conn.cursor()
 
-    return conn
+    dateFormat = '%d-%m-%y %H:%M'
+    dateTimeNow = datetime.now().strftime(dateFormat)
+
+    cursor.execute(
+        'INSERT INTO decks VALUES (?, ?)',
+        (dateTimeNow, 'boston'))
+    conn.commit()
+
+    id = cursor.execute("""
+        SELECT * FROM decks
+        WHERE ID = (
+            SELECT MAX(id) FROM decks
+        )
+        """ 
+    ).fetchval()
+
+    for card in deck[1::]:
+        card['deckId'] = id
+            
+        cursor.execute(
+            'INSERT INTO cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (card['deckId'], card['name'], card['pic'], card['age'], card['team'],
+            card['pos'], card['min'], card['fg'], card['thr'], card['reb'],
+            card['ast'], card['stl'], card['blk'], card['tov'], card['ppg'])
+            )
+            
+
+    conn.commit()
+
+    return
+
+
+# This function reads and returns all decks from the DB in JSON format
+def read_deck():
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT * FROM decks'
+    )
+
+    deck_keys = ['id', 'saved', 'bias']
+
+    decks = []
+    for row in cursor:
+        deck = {}
+        i = -1
+        for data in row:
+            i += 1
+            deck[deck_keys[i]] = data
+        decks.append(deck)
+
+    card_keys = ['cardId', "deckId", "name", "pic", "age", "team", "pos", "min",
+                "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
+    
+    entries = []
+    i = -1
+    for deck in decks:
+        i += 1
+        combine = [deck]
+        cursor.execute(
+            f'SELECT * FROM cards WHERE deckID = {deck["id"]}'
+        )
+        for row in cursor:
+            dict = {}
+            j = -1
+            for keys in card_keys:
+                j += 1
+                dict[keys] = row[j]
+            combine.append(dict)
+        entries.append(combine)
+
+    return json.dumps(entries)
+
+
+# This function updates a deck in the DB
+def update_deck(deck):
+    conn = connect()
+    cursor = conn.cursor()
+
+    dateFormat = '%d-%m-%y %H:%M'
+    dateTimeNow = datetime.now().strftime(dateFormat)
+
+    id = deck[0]['id']
+
+    deck_keys = ['saved', 'bias']
+
+    cursor.execute(
+        f'UPDATE decks SET saved = ?, bias = ? WHERE id = ?;',
+        (dateTimeNow, 'Boston', id)
+    )
+    conn.commit()
+
+    card_keys = ['name', 'pic', 'age', 'team', 'pos', 'min',
+                'fg', 'thr', 'reb', 'ast', 'stl', 'blk', 'tov', 'ppg']
+
+    cursor.execute(
+        f'SELECT * FROM cards WHERE deckId = {id}'
+    )
+
+    indices = []
+    for card in cursor:
+        indices.append(card[0])
+
+    i = -1
+    for card in deck[1::]:
+        i += 1
+        for key in card_keys:
+            cursor.execute(
+                f'UPDATE cards SET {key} = ? WHERE cardId = ?;',
+                (card[key], indices[i])
+            )
+    conn.commit()
+    
+    return
+
+
+# This function deletes a deck from the DB
+def delete_deck(deck):
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        f'DELETE FROM decks WHERE id = {deck["id"]}'
+    )
+
+    cursor.commit()
 
 
 # This function creates two tables in the DB for decks and cards
@@ -34,7 +153,7 @@ def initialize_tables():
     decks =  """
         IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='decks' AND xtype='U') 
             CREATE TABLE decks (
-                id int IDENTITY(1,1) PRIMARY KEY,
+                id INT IDENTITY(1,1) PRIMARY KEY,
                 saved VARCHAR(30),
                 bias VARCHAR(30));
             """
@@ -42,11 +161,11 @@ def initialize_tables():
     cards = """
         IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cards' AND xtype='U')
             CREATE TABLE cards (
-                deckId int,
-                FOREIGN KEY(deckId) REFERENCES decks(id),
+                cardId INT PRIMARY KEY IDENTITY(1,1),
+                deckId INT FOREIGN KEY(deckId) REFERENCES decks(id) ON DELETE CASCADE,
                 name VARCHAR(50),
                 pic VARCHAR(100),
-                age smallint,
+                age SMALLINT,
                 team VARCHAR(5),
                 pos VARCHAR(5),
                 min FLOAT, 
@@ -68,7 +187,23 @@ def initialize_tables():
     return
 
 
+# This function can be used to clear the DB
+def reset():
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute('DROP TABLE cards')
+    cursor.execute('DROP TABLE decks')
+    #cursor.execute('DROP DATABASE decks')
+    #cursor.execute('CREATE DATABASE decksDB')
+    #cursor.execute("TRUNCATE TABLE players")
+    #cursor.execute("TRUNCATE TABLE decks")
 
+    conn.commit()
+
+    return
+
+
+# This function will write all tables to the console
 def display_tables():
     conn = connect()
     cursor = conn.cursor()
@@ -86,7 +221,11 @@ def display_tables():
         print("\n----- Table "+ str(i) +" -----")
         print(tables[i])
 
+    print("\n--- Table Data ---")
+    i = -1
     for table in tables:
+        i += 1
+        print("\n----- Table "+ str(i) +" -----")
         cursor.execute(f'SELECT * FROM {table[2]}')
         for row in cursor:
             print(f'{row}')
@@ -95,129 +234,18 @@ def display_tables():
     return
 
 
+# This function establishes a connection to the MSSQL DB
+def connect():
+    conn = pyodbc.connect(
+                            "Driver={SQL Server Native Client 11.0};"
+                            "Server=website-db.cmtiqqjm470n.us-east-1.rds.amazonaws.com,1433;"
+                            "Database=decks_db;"
+                            "Trusted_Connection=no;"
+                            "UID=davidluby;"
+                            "PWD=ASIOB785$^%"
+                        )
 
-def intake_deck(deck):
-    conn = connect()
-    cursor = conn.cursor()
-
-    dateFormat = '%d-%m-%y %H:%M'
-    dateTimeNow = datetime.now().strftime(dateFormat)
-
-    if (deck[0]['id'] == 'null'):
-        cursor.execute(
-            'INSERT INTO decks VALUES (?, ?)',
-            (dateTimeNow, 'boston'))
-        conn.commit()
-
-        id = cursor.execute("""
-            SELECT * FROM decks
-            WHERE ID = (
-                SELECT MAX(id) FROM decks
-            )
-            """ 
-        ).fetchval()
-
-        for cards in deck[1::]:
-            cards['deckId'] = id
-            
-            cursor.execute(
-                'INSERT INTO cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                (cards["deckId"], cards["name"], cards["pic"], cards["age"], cards["team"],
-                 cards["pos"], cards["min"], cards["fg"], cards["thr"], cards["reb"],
-                 cards["ast"], cards["stl"], cards["blk"], cards["tov"], cards["ppg"])
-            )
-            
-
-            conn.commit()
-
-    else:
-        print("update id")
-
-    conn.commit()
-    return
-
-
-
-def read_deck():
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute(
-        'SELECT * FROM decks'
-    )
-
-    deck_keys = ['id', 'saved', 'bias']
-
-    decks = []
-    for row in cursor:
-        deck = {}
-        i = -1
-        for data in row:
-            i += 1
-            deck[deck_keys[i]] = data
-        decks.append(deck)
-
-    cursor.execute(
-        'SELECT * FROM cards'
-    )
-
-    card_keys = ["deckId", "name", "pic", "age", "team", "pos", "min",
-                "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
-    
-    entries = []
-    i = -1
-    for deck in decks:
-        i += 1
-        combine = [deck]
-        cursor.execute(
-            f'SELECT * FROM cards WHERE deckID = {deck["id"]}'
-        )
-        for row in cursor:
-            dict = {}
-            j = -1
-            for keys in card_keys:
-                j += 1
-                dict[keys] = row[j]
-            combine.append(dict)
-        entries.append(combine)
-    #print(entries)
-
-    return json.dumps(entries)
-
-
-
-# This function updates data in the DB
-def update():
-    conn = connect()
-    #print("Update")
-    cursor = conn.cursor()
-    cursor.execute(
-        'update dummy set b = ? where a = ?;',
-        ('dogzzz', 3232)
-    )
-    conn.commit()
-    return
-
-
-
-# This function can be used to clear the DB
-def reset():
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute('DROP TABLE cards')
-    cursor.execute('DROP TABLE decks')
-
-    #cursor.execute("TRUNCATE TABLE players")
-    #cursor.execute("TRUNCATE TABLE decks")
-
-    """cursor.execute(
-        'delete from dummy where a > 5'
-    )
-    """
-
-    conn.commit()
-
-    return
-
+    return conn
 
 
 # Main method
@@ -227,8 +255,6 @@ def main():
     #reset()
     display_tables()
     #read_deck()
-
-
 
 
 if __name__ == '__main__':

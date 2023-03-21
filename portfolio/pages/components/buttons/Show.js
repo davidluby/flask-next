@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react'
 
 import Card from "../card/Card"
+import Edit from "../buttons/Edit"
+import Delete from "../buttons/Delete"
 
-export default function Show() {
-    const [decks, setDecks] = useState("");
+export default function Show({ setCards, setDeck, setHidden }) {
+    const [dataDecks, setDataDecks] = useState("");
     const [empty, setEmpty] = useState(true);
 
     const Show = () => {
-        fetch('/api/show_decks', {
+        fetch('/api/show_deck', {
             method: "GET"
         }
         ).then(
             response => response.json()
             .then(
                 data => {
-                    setDecks(JSON.parse(data))
+                    setDataDecks(JSON.parse(data))
                     setEmpty(false)
                 }
             )
@@ -27,14 +29,16 @@ export default function Show() {
                 onClick={Show}>
             Show Saved Decks
         </button>
-        { !empty ? decks.map(function(deck, idx) {
-                    const cards = deck.slice(1);
-                    const data = deck[0];
+        { !empty ? dataDecks.map(function(deck, idx) {
+                    const dataCards = deck.slice(1);
+                    const dataDeck = deck[0];
 
                     return <div key={idx}>
-                                Deck {data.id} -- Bias: {data.bias} -- Time saved: {data.saved}
+                            <Edit dataCards={dataCards} setCards={setCards} dataDeck={dataDeck} setDeck={setDeck} setHidden={setHidden} />
+                            <Delete dataDeck={dataDeck} />
+                                Deck {dataDeck.id} -- Bias: {dataDeck.bias} -- Time saved: {dataDeck.saved}
                                 <div className="flex flex-row justify-center">
-                                    {cards.map(function(card, jdx) {
+                                    {dataCards.map(function(card, jdx) {
                                         return <div key={jdx}>
                                                     <Card data={card} loc={idx.toString()+jdx.toString()} />
                                                 </div>

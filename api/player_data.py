@@ -16,9 +16,8 @@ import requests
 import json
 
 
-
 """
- # This function takes a players full name and returns the corresponding
+ # This function takes a player's full name and returns the corresponding
  # URL from Basketball-Reference.com
 """
 def find_player(full_name):
@@ -75,7 +74,6 @@ def find_player(full_name):
     return(flag, data, soup)
 
 
-
 """
  # This function takes a player page soup and returns the corresponding
  # player's statistics from Basketball-Reference.com
@@ -105,25 +103,23 @@ def get_data(flag, data, soup):
 
 # This function parses soup, appends to a list, and returns JSON data
 def format_json(data):
-    card_keys = ["deckId", "name", "pic", "age", "team", "pos", "min",
-                "fg", "thr", "reb", "ast", "stl", "blk", "tov", "ppg"]
+    card_keys = ['cardId', 'deckId', 'name', 'pic', 'age', 'team', 'pos', 'min',
+                'fg', 'thr', 'reb', 'ast', 'stl', 'blk', 'tov', 'ppg']
 
     dict = {}
     i = -1
     for keys in card_keys:
         i += 1
-        if i == 0:
+        if i < 2:
             dict[keys] = "null"
         else:
-            dict[keys] = data[i-1]
+            dict[keys] = data[i-2]
     
     out = json.dumps(dict)
 
     return(out)
 
-
-
-
+# Main method
 def main(name):
     flag, data, soup = find_player(name)
     stats = get_data(flag, data, soup)
@@ -132,7 +128,6 @@ def main(name):
 
 
 if __name__ == '__main__':
-    # duplicate at jonesda01-jonesda05
-    # short names k love, b bass, b roy
+
     print(main('lebron james'))
 

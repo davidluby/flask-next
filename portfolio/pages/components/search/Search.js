@@ -3,12 +3,10 @@ import Card from "../card/Card"
 import Add from "../buttons/Add"
 import Interface from "../interface/Interface"
 
-export default function Search({ cards, setCards, deck, setDeck }) {
+export default function Search({ cards, setCards, deck, setDeck, hidden, setHidden }) {
     const [name, setName] = useState("");
     const [playerData, setPlayerData] = useState("");
     const [searching, setSearching] = useState(true);
-
-    const [hidden, setHidden] = useState(true);
 
 
     const handleSubmit = event => {
